@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Report Issue{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Report an Issue</h2>
+    <form method="POST" action="{{ url_for('visitor.report_issue') }}">
+        <div class="form-group">
+            <label for="description">Issue Description:</label>
+            <textarea class="form-control" id="description" name="description" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </form>
+</div>
+{% endblock %}
