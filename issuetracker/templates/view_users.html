@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - View User{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">User Profile</h3>
+                <a href="{{ url_for('manage_users') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Users
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-3 text-center">
+                        <div class="mb-3">
+                            {% if user.profile_image %}
+                                <img src="{{ url_for('static', filename='images/profile_images/' + user.profile_image) }}" alt="{{ user.username }}" class="profile-img-lg">
+                            {% else %}
+                                <div class="profile-img-lg bg-secondary d-flex align-items-center justify-content-center text-white mx-auto">
+                                    {{ user.username[0].upper() }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+                        <p class="text-muted">@{{ user.username }}</p>
+                        
+                        <div class="mb-2">
+                            <span class="badge
+                                {% if user.role == 'admin' %}bg-danger{% endif %}
+                                {% if user.role == 'helper' %}bg-success{% endif %}
+                                {% if user.role == 'visitor' %}bg-primary{% endif %}
+                            ">
+                                {{ user.role|capitalize }}
+                            </span>
+                            <span class="badge {% if user.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ user.status|capitalize }}
+                            </span>
+                        </div>
+                        
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Location:</strong> {{ user.location }}</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Change Status</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ url_for('change_user_status', user_id=user.user_id) }}" method="post">
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">User Status</label>
+                                        <select class="form-select" id="status" name="status">
+                                            <option value="active" {% if user.status == 'active' %}selected{% endif %}>Active</option>
+                                            <option value="inactive" {% if user.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                        </select>
+                                        <div class="form-text">
+                                            Inactive users cannot log in to the system.
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Update Status</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Change Role</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ url_for('change_user_role', user_id=user.user_id) }}" method="post">
+                                    <div class="mb-3">
+                                        <label for="role" class="form-label">User Role</label>
+                                        <select class="form-select" id="role" name="role">
+                                            <option value="visitor" {% if user.role == 'visitor' %}selected{% endif %}>Visitor</option>
+                                            <option value="helper" {% if user.role == 'helper' %}selected{% endif %}>Helper</option>
+                                            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                        </select>
+                                        <div class="form-text">
+                                            Be careful when changing user roles, especially when demoting admins.
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Update Role</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User's Issues -->
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Issues Reported by {{ user.first_name }}</h5>
+            </div>
+            <div class="card-body">
+                {% if user_issues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Summary</th>
+                                    <th>Status</th>
+                                    <th>Date Reported</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for issue in user_issues %}
+                                    <tr>
+                                        <td>#{{ issue.issue_id }}</td>
+                                        <td>{{ issue.summary }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill
+                                                {% if issue.status == 'new' %}bg-danger{% endif %}
+                                                {% if issue.status == 'open' %}bg-warning text-dark{% endif %}
+                                                {% if issue.status == 'stalled' %}bg-secondary{% endif %}
+                                                {% if issue.status == 'resolved' %}bg-success{% endif %}
+                                            ">
+                                                {{ issue.status|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center py-3">This user hasn't reported any issues yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('manage_users') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-people me-2"></i> All Users
+                    </a>
+                    <a href="{{ url_for('admin_home') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
+                    </a>
+                    <a href="{{ url_for('all_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-list-ul me-2"></i> All Issues
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Role Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>Visitor</h6>
+                <p>Regular campground visitors who can report issues and track their own reported issues.</p>
+                
+                <h6>Helper</h6>
+                <p>Volunteers who maintain the campground and can view and respond to all issues.</p>
+                
+                <h6>Admin</h6>
+                <p>System administrators who can manage users and issues.</p>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> Make sure there is always at least one active admin user in the system.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

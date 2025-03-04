@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - Issue Detail{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4 issue-{{ issue.status }}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">Issue Detail</h3>
+                <span class="badge rounded-pill
+                    {% if issue.status == 'new' %}bg-danger{% endif %}
+                    {% if issue.status == 'open' %}bg-warning text-dark{% endif %}
+                    {% if issue.status == 'stalled' %}bg-secondary{% endif %}
+                    {% if issue.status == 'resolved' %}bg-success{% endif %}
+                ">
+                    {{ issue.status|capitalize }}
+                </span>
+            </div>
+            <div class="card-body">
+                <h4 class="mb-3">{{ issue.summary }}</h4>
+                <div class="d-flex align-items-center mb-4">
+                    <div class="me-3">
+                        {% if issue.profile_image %}
+                            <img src="{{ url_for('static', filename='images/profile_images/' + issue.profile_image) }}" alt="{{ issue.username }}" class="profile-img">
+                        {% else %}
+                            <div class="profile-img bg-secondary d-flex align-items-center justify-content-center text-white">
+                                {{ issue.username[0].upper() }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="mb-0">Reported by <strong>{{ issue.first_name }} {{ issue.last_name }}</strong> (@{{ issue.username }})</p>
+                        <p class="text-muted mb-0">{{ issue.created_at.strftime('%d %b %Y, %H:%M') }}</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h5>Description</h5>
+                    <p class="mb-0">{{ issue.description|replace('\n', '<br>')|safe }}</p>
+                </div>
+                
+                {% if session.role in ['helper', 'admin'] %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Update Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ url_for('update_status', issue_id=issue.issue_id) }}" method="post" class="d-flex">
+                                <select name="status" class="form-select me-2">
+                                    <option value="new" {% if issue.status == 'new' %}selected{% endif %}>New</option>
+                                    <option value="open" {% if issue.status == 'open' %}selected{% endif %}>Open</option>
+                                    <option value="stalled" {% if issue.status == 'stalled' %}selected{% endif %}>Stalled</option>
+                                    <option value="resolved" {% if issue.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <h5 class="mb-3">Comments ({{ comments|length }})</h5>
+                {% if comments %}
+                    <div class="comment-list mb-4">
+                        {% for comment in comments %}
+                            <div class="card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                    <div class="d-flex align-items-center">
+                                        {% if comment.profile_image %}
+                                            <img src="{{ url_for('static', filename='images/profile_images/' + comment.profile_image) }}" alt="{{ comment.username }}" class="profile-img me-2">
+                                        {% else %}
+                                            <div class="profile-img bg-secondary d-flex align-items-center justify-content-center text-white me-2">
+                                                {{ comment.username[0].upper() }}
+                                            </div>
+                                        {% endif %}
+                                        <span>
+                                            <strong>{{ comment.first_name }} {{ comment.last_name }}</strong>
+                                            (@{{ comment.username }})
+                                            <span class="badge bg-info text-white">{{ comment.role }}</span>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ comment.created_at.strftime('%d %b %Y, %H:%M') }}</small>
+                                </div>
+                                <div class="card-body py-3">
+                                    <p class="card-text mb-0">{{ comment.content|replace('\n', '<br>')|safe }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center py-3 text-muted">No comments yet.</p>
+                {% endif %}
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Add Comment</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('add_comment', issue_id=issue.issue_id) }}" method="post">
+                            <div class="mb-3">
+                                <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Post Comment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Issue Information</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Issue ID:</span>
+                        <span class="text-muted">#{{ issue.issue_id }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Status:</span>
+                        <span class="badge rounded-pill
+                            {% if issue.status == 'new' %}bg-danger{% endif %}
+                            {% if issue.status == 'open' %}bg-warning text-dark{% endif %}
+                            {% if issue.status == 'stalled' %}bg-secondary{% endif %}
+                            {% if issue.status == 'resolved' %}bg-success{% endif %}
+                        ">
+                            {{ issue.status|capitalize }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Date Reported:</span>
+                        <span class="text-muted">{{ issue.created_at.strftime('%d %b %Y') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Time Reported:</span>
+                        <span class="text-muted">{{ issue.created_at.strftime('%H:%M') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Comment Count:</span>
+                        <span class="text-muted">{{ comments|length }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('my_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-list-ul me-2"></i> My Issues
+                    </a>
+                    <a href="{{ url_for('new_issue') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-plus-circle me-2"></i> Report New Issue
+                    </a>
+                    {% if session.role in ['helper', 'admin'] %}
+                        <a href="{{ url_for('all_issues') }}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-list-check me-2"></i> All Issues
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

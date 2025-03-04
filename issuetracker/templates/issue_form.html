@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - Report Issue{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h3 class="card-title mb-0">Report an Issue</h3>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">
+                    Please provide details about the issue you've encountered at the campground.
+                    Be as specific as possible to help our volunteers address the problem quickly.
+                </p>
+                
+                <form action="{{ url_for('new_issue') }}" method="post">
+                    <div class="mb-3">
+                        <label for="summary" class="form-label">Summary</label>
+                        <input type="text" class="form-control" id="summary" name="summary" 
+                               placeholder="Brief description of the issue (e.g., 'Blocked toilet in North Block')" 
+                               value="{{ summary|default('') }}" required maxlength="255">
+                        <div class="form-text">A short, descriptive title for the issue (max 255 characters)</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  placeholder="Detailed description of the issue (e.g., 'The second toilet in the north block is completely blocked and unusable.')" 
+                                  rows="5" required>{{ description|default('') }}</textarea>
+                        <div class="form-text">
+                            Please include relevant details such as:
+                            <ul>
+                                <li>Exact location (which site, building, or area)</li>
+                                <li>When you noticed the issue</li>
+                                <li>How severe the problem is</li>
+                                <li>Any actions you've already taken</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('root') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Submit Issue</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

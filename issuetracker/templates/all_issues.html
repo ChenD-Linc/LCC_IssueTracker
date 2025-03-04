@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - All Issues{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>All Issues</h2>
+            <a href="{{ url_for('new_issue') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Report New Issue
+            </a>
+        </div>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'active' %}active{% endif %}" 
+                           href="{{ url_for('all_issues', status='active') }}">Active Issues</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'new' %}active{% endif %}" 
+                           href="{{ url_for('all_issues', status='new') }}">New</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'open' %}active{% endif %}" 
+                           href="{{ url_for('all_issues', status='open') }}">Open</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'stalled' %}active{% endif %}" 
+                           href="{{ url_for('all_issues', status='stalled') }}">Stalled</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'resolved' %}active{% endif %}" 
+                           href="{{ url_for('all_issues', status='resolved') }}">Resolved</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'all' %}active{% endif %}" 
+                           href="{{ url_for('all_issues', status='all') }}">All</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                {% if issues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Summary</th>
+                                    <th>Reported By</th>
+                                    <th>Status</th>
+                                    <th>Date Reported</th>
+                                    <th>Comments</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for issue in issues %}
+                                    <tr>
+                                        <td>#{{ issue.issue_id }}</td>
+                                        <td>{{ issue.summary }}</td>
+                                        <td>{{ issue.first_name }} {{ issue.last_name }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill
+                                                {% if issue.status == 'new' %}bg-danger{% endif %}
+                                                {% if issue.status == 'open' %}bg-warning text-dark{% endif %}
+                                                {% if issue.status == 'stalled' %}bg-secondary{% endif %}
+                                                {% if issue.status == 'resolved' %}bg-success{% endif %}
+                                            ">
+                                                {{ issue.status|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>{{ issue.comment_count }}</td>
+                                        <td>
+                                            <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <p>No issues found matching the selected filter.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

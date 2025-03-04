@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - My Issues{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>My Reported Issues</h2>
+            <a href="{{ url_for('new_issue') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Report New Issue
+            </a>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-body">
+                {% if issues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Summary</th>
+                                    <th>Status</th>
+                                    <th>Date Reported</th>
+                                    <th>Comments</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for issue in issues %}
+                                    <tr>
+                                        <td>#{{ issue.issue_id }}</td>
+                                        <td>{{ issue.summary }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill
+                                                {% if issue.status == 'new' %}bg-danger{% endif %}
+                                                {% if issue.status == 'open' %}bg-warning text-dark{% endif %}
+                                                {% if issue.status == 'stalled' %}bg-secondary{% endif %}
+                                                {% if issue.status == 'resolved' %}bg-success{% endif %}
+                                            ">
+                                                {{ issue.status|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>{{ issue.comment_count }}</td>
+                                        <td>
+                                            <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <p class="mb-4">You haven't reported any issues yet.</p>
+                        <a href="{{ url_for('new_issue') }}" class="btn btn-primary">Report an Issue</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

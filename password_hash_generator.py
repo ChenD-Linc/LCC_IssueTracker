@@ -1,32 +1,65 @@
+"""Script to generate password hashes for user accounts in the LCC Issue Tracker.
+
+This script will generate bcrypt password hashes for all user accounts you wish
+to include in your database population script. Each user account should have a
+unique password.
+
+Before running this script, make sure you've installed flask_bcrypt.
+"""
+from collections import namedtuple
+from flask import Flask
 from flask_bcrypt import Bcrypt
 
-bcrypt = Bcrypt()
+# A simple "User Account" class to store username and password
+UserAccount = namedtuple('UserAccount', ['username', 'password'])
 
-def generate_password_hash(password):
-    """Generate a bcrypt password hash"""
-    return bcrypt.generate_password_hash(password).decode('utf-8')
+app = Flask(__name__)
+flask_bcrypt = Bcrypt(app)
 
-def main():
-    """Generate password hashes for the SQL script"""
-    print("Password Hash Generator for LCC Issue Tracker")
-    print("---------------------------------------------")
-    print("This tool helps you generate password hashes for your database population script.")
-    print("For each user, enter a password and the tool will generate a hash you can copy into your SQL script.")
-    print("Press Ctrl+C to exit at any time.\n")
+# Define the users for which to generate password hashes
+users = [
+    # Visitors (20)
+    UserAccount('visitor1', 'Visitor1Pass!'),
+    UserAccount('visitor2', 'Visitor2Pass!'),
+    UserAccount('visitor3', 'Visitor3Pass!'),
+    UserAccount('visitor4', 'Visitor4Pass!'),
+    UserAccount('visitor5', 'Visitor5Pass!'),
+    UserAccount('visitor6', 'Visitor6Pass!'),
+    UserAccount('visitor7', 'Visitor7Pass!'),
+    UserAccount('visitor8', 'Visitor8Pass!'),
+    UserAccount('visitor9', 'Visitor9Pass!'),
+    UserAccount('visitor10', 'Visitor10Pass!'),
+    UserAccount('visitor11', 'Visitor11Pass!'),
+    UserAccount('visitor12', 'Visitor12Pass!'),
+    UserAccount('visitor13', 'Visitor13Pass!'),
+    UserAccount('visitor14', 'Visitor14Pass!'),
+    UserAccount('visitor15', 'Visitor15Pass!'),
+    UserAccount('visitor16', 'Visitor16Pass!'),
+    UserAccount('visitor17', 'Visitor17Pass!'),
+    UserAccount('visitor18', 'Visitor18Pass!'),
+    UserAccount('visitor19', 'Visitor19Pass!'),
+    UserAccount('visitor20', 'Visitor20Pass!'),
     
-    try:
-        while True:
-            password = input("Enter password: ")
-            if not password:
-                print("Password cannot be empty. Try again.")
-                continue
-                
-            password_hash = generate_password_hash(password)
-            print(f"Password hash: '{password_hash}'")
-            print("Copy this hash into your SQL INSERT statement.")
-            print("---------------------------------------------\n")
-    except KeyboardInterrupt:
-        print("\nExiting password hash generator. Goodbye!")
+    # Helpers (5)
+    UserAccount('helper1', 'Helper1Pass!'),
+    UserAccount('helper2', 'Helper2Pass!'),
+    UserAccount('helper3', 'Helper3Pass!'),
+    UserAccount('helper4', 'Helper4Pass!'),
+    UserAccount('helper5', 'Helper5Pass!'),
+    
+    # Admins (2)
+    UserAccount('admin1', 'Admin1Pass!'),
+    UserAccount('admin2', 'Admin2Pass!')
+]
 
-if __name__ == "__main__":
-    main()
+print('Username | Password | Hash | Password Matches Hash')
+
+for user in users:
+    # Generate a bcrypt hash using the default settings
+    password_hash = flask_bcrypt.generate_password_hash(user.password)
+    
+    # Check whether the hash matches the original password
+    password_matches_hash = flask_bcrypt.check_password_hash(password_hash, user.password)
+
+    # Output username, password, hash, and verification result
+    print(f'{user.username} | {user.password} | {password_hash.decode()} | {password_matches_hash}')

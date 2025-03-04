@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <!-- User Stats -->
+    <div class="col-md-6">
+        <div class="card shadow h-100">
+            <div class="card-header">
+                <h5 class="mb-0">User Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 text-center">
+                        <div class="display-4 text-primary">{{ user_stats.visitor_count }}</div>
+                        <p>Visitors</p>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="display-4 text-success">{{ user_stats.helper_count }}</div>
+                        <p>Helpers</p>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="display-4 text-danger">{{ user_stats.admin_count }}</div>
+                        <p>Admins</p>
+                    </div>
+                </div>
+                <div class="d-grid mt-3">
+                    <a href="{{ url_for('manage_users') }}" class="btn btn-outline-primary">Manage Users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Issue Stats -->
+    <div class="col-md-6">
+        <div class="card shadow h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Issue Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3 text-center">
+                        <div class="display-4 text-danger">{{ issue_stats.new_count }}</div>
+                        <p>New</p>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="display-4 text-warning">{{ issue_stats.open_count }}</div>
+                        <p>Open</p>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="display-4 text-secondary">{{ issue_stats.stalled_count }}</div>
+                        <p>Stalled</p>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="display-4 text-success">{{ issue_stats.resolved_count }}</div>
+                        <p>Resolved</p>
+                    </div>
+                </div>
+                <div class="d-grid mt-3">
+                    <a href="{{ url_for('all_issues') }}" class="btn btn-outline-primary">View All Issues</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Activity -->
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_activity %}
+                    <div class="list-group">
+                        {% for activity in recent_activity %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        <a href="{{ url_for('view_issue', issue_id=activity.issue_id) }}">{{ activity.summary }}</a>
+                                    </h6>
+                                    <small>{{ activity.created_at.strftime('%d %b %Y, %H:%M') }}</small>
+                                </div>
+                                <p class="mb-1">{{ activity.content|truncate(100) }}</p>
+                                <div class="d-flex align-items-center">
+                                    {% if activity.profile_image %}
+                                        <img src="{{ url_for('static', filename='images/profile_images/' + activity.profile_image) }}" alt="{{ activity.username }}" class="profile-img me-2">
+                                    {% else %}
+                                        <div class="profile-img me-2 bg-secondary d-flex align-items-center justify-content-center text-white">
+                                            {{ activity.username[0].upper() }}
+                                        </div>
+                                    {% endif %}
+                                    <small>{{ activity.username }} ({{ activity.role }})</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center py-3">No recent activity.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Links -->
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Admin Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('manage_users') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-people me-2"></i> Manage Users
+                    </a>
+                    <a href="{{ url_for('all_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-list-ul me-2"></i> View All Issues
+                    </a>
+                    <a href="{{ url_for('resolved_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-check-circle me-2"></i> Resolved Issues
+                    </a>
+                    <a href="{{ url_for('new_issue') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-plus-circle me-2"></i> Report New Issue
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Admin Resources</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>User Management:</strong></p>
+                <ul>
+                    <li><strong>Change Status:</strong> Activate or deactivate user accounts</li>
+                    <li><strong>Change Role:</strong> Promote visitors to helpers or admins</li>
+                    <li><strong>Search:</strong> Find users by username, first name, or last name</li>
+                </ul>
+                <p><strong>Issue Status Guide:</strong></p>
+                <ul>
+                    <li><strong>New:</strong> Reported, but no work started</li>
+                    <li><strong>Open:</strong> Work has begun to investigate or address the issue</li>
+                    <li><strong>Stalled:</strong> The issue cannot be progressed at the moment</li>
+                    <li><strong>Resolved:</strong> The issue has been addressed</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

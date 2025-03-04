@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - Helper Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2 class="mb-4">Helper Dashboard</h2>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Active Issues</h5>
+                <a href="{{ url_for('all_issues') }}" class="btn btn-sm btn-primary">View All Issues</a>
+            </div>
+            <div class="card-body">
+                {% if active_issues %}
+                    <ul class="nav nav-tabs mb-3" id="issuesTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="new-tab" data-bs-toggle="tab" data-bs-target="#new" type="button" role="tab">New</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="open-tab" data-bs-toggle="tab" data-bs-target="#open" type="button" role="tab">Open</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="stalled-tab" data-bs-toggle="tab" data-bs-target="#stalled" type="button" role="tab">Stalled</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="issuesTabContent">
+                        <div class="tab-pane fade show active" id="new" role="tabpanel" aria-labelledby="new-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Summary</th>
+                                            <th>Reported By</th>
+                                            <th>Date Reported</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for issue in active_issues if issue.status == 'new' %}
+                                            <tr>
+                                                <td>{{ issue.summary }}</td>
+                                                <td>{{ issue.first_name }} {{ issue.last_name }}</td>
+                                                <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                                <td>
+                                                    <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="4" class="text-center py-3">No new issues</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="open" role="tabpanel" aria-labelledby="open-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Summary</th>
+                                            <th>Reported By</th>
+                                            <th>Date Reported</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for issue in active_issues if issue.status == 'open' %}
+                                            <tr>
+                                                <td>{{ issue.summary }}</td>
+                                                <td>{{ issue.first_name }} {{ issue.last_name }}</td>
+                                                <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                                <td>
+                                                    <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="4" class="text-center py-3">No open issues</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="stalled" role="tabpanel" aria-labelledby="stalled-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Summary</th>
+                                            <th>Reported By</th>
+                                            <th>Date Reported</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for issue in active_issues if issue.status == 'stalled' %}
+                                            <tr>
+                                                <td>{{ issue.summary }}</td>
+                                                <td>{{ issue.first_name }} {{ issue.last_name }}</td>
+                                                <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                                <td>
+                                                    <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="4" class="text-center py-3">No stalled issues</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p>There are no active issues at the moment.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('new_issue') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-plus-circle me-2"></i> Report New Issue
+                    </a>
+                    <a href="{{ url_for('all_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-list-ul me-2"></i> View All Issues
+                    </a>
+                    <a href="{{ url_for('resolved_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-check-circle me-2"></i> Resolved Issues
+                    </a>
+                    <a href="{{ url_for('my_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person me-2"></i> My Reported Issues
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Helper Resources</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Issue Status Guide:</strong></p>
+                <ul>
+                    <li><strong>New:</strong> Reported, but no work started</li>
+                    <li><strong>Open:</strong> Work has begun to investigate or address the issue</li>
+                    <li><strong>Stalled:</strong> The issue cannot be progressed at the moment</li>
+                    <li><strong>Resolved:</strong> The issue has been addressed</li>
+                </ul>
+                <p><small>When you comment on a new, stalled, or resolved issue, it will automatically be set to "open".</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

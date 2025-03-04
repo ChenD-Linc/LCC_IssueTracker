@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - Resolved Issues{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Resolved Issues</h2>
+            <a href="{{ url_for('all_issues') }}" class="btn btn-primary">
+                <i class="bi bi-list-ul me-1"></i> View Active Issues
+            </a>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-body">
+                {% if resolved_issues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Summary</th>
+                                    <th>Reported By</th>
+                                    <th>Date Resolved</th>
+                                    <th>Comments</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for issue in resolved_issues %}
+                                    <tr>
+                                        <td>#{{ issue.issue_id }}</td>
+                                        <td>{{ issue.summary }}</td>
+                                        <td>{{ issue.first_name }} {{ issue.last_name }}</td>
+                                        <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>{{ issue.comment_count }}</td>
+                                        <td>
+                                            <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if total_pages > 1 %}
+                        <nav aria-label="Resolved issues pagination">
+                            <ul class="pagination justify-content-center mt-4">
+                                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                                    <a class="page-link" href="{{ url_for('resolved_issues', page=page-1) if page > 1 else '#' }}">Previous</a>
+                                </li>
+                                
+                                {% for p in range(1, total_pages + 1) %}
+                                    <li class="page-item {% if p == page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('resolved_issues', page=p) }}">{{ p }}</a>
+                                    </li>
+                                {% endfor %}
+                                
+                                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                                    <a class="page-link" href="{{ url_for('resolved_issues', page=page+1) if page < total_pages else '#' }}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <p>No resolved issues found.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

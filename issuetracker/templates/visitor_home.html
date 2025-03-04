@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - Visitor Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2 class="mb-4">Welcome, {{ session.username }}</h2>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">My Reported Issues</h5>
+                <a href="{{ url_for('new_issue') }}" class="btn btn-sm btn-primary">Report New Issue</a>
+            </div>
+            <div class="card-body">
+                {% if issues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Summary</th>
+                                    <th>Date Reported</th>
+                                    <th>Comments</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for issue in issues %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge rounded-pill
+                                                {% if issue.status == 'new' %}bg-danger{% endif %}
+                                                {% if issue.status == 'open' %}bg-warning text-dark{% endif %}
+                                                {% if issue.status == 'stalled' %}bg-secondary{% endif %}
+                                                {% if issue.status == 'resolved' %}bg-success{% endif %}
+                                            ">
+                                                {{ issue.status|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>{{ issue.summary }}</td>
+                                        <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>{{ issue.comment_count }}</td>
+                                        <td>
+                                            <a href="{{ url_for('view_issue', issue_id=issue.issue_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-3">You haven't reported any issues yet.</p>
+                        <a href="{{ url_for('new_issue') }}" class="btn btn-primary">Report an Issue</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('new_issue') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-plus-circle me-2"></i> Report New Issue
+                    </a>
+                    <a href="{{ url_for('my_issues') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-list-ul me-2"></i> View All My Issues
+                    </a>
+                    <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person me-2"></i> My Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">About LCC</h5>
+            </div>
+            <div class="card-body">
+                <p>Lincoln Community Campground is a privately owned campground on the outskirts of Lincoln.</p>
+                <p>The campground is maintained by a group of local volunteers known as "helpers" who keep the facilities in good condition.</p>
+                <p>If you encounter any issues with the facilities, please report them using this system.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

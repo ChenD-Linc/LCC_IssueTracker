@@ -1,0 +1,35 @@
+# Virtual environment
+venv/
+env/
+.env/
+
+# Database connection details
+issuetracker/connect.py
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Local development settings
+.env
+.vscode/
+.idea/
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# User uploaded profile images
+static/images/profile_images/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

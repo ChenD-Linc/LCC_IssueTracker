@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}LCC Issue Tracker - Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header">
+                <h3 class="card-title mb-0">Login</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('login') }}" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control {% if username_invalid %}is-invalid{% endif %}" 
+                               id="username" name="username" value="{{ username|default('') }}" required>
+                        {% if username_invalid %}
+                            <div class="invalid-feedback">
+                                Account not found. Please check your username or register.
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control {% if password_invalid %}is-invalid{% endif %}" 
+                               id="password" name="password" required>
+                        {% if password_invalid %}
+                            <div class="invalid-feedback">
+                                Incorrect password. Please try again.
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if account_inactive %}
+                        <div class="alert alert-warning" role="alert">
+                            This account has been deactivated. Please contact an administrator.
+                        </div>
+                    {% endif %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">
+                    Don't have an account? <a href="{{ url_for('signup') }}">Register</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
